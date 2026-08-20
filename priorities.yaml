@@ -1,0 +1,68 @@
+# Prioridades para filtrar el ruido del digest.
+# Basado en los temas que dominan la conversación de IA en 2026 (labs, agentes,
+# seguridad, economía de la IA, aplicaciones verticales). Edita esta lista cuando
+# cambie el panorama — no hace falta tocar el script.
+
+# Si el título menciona alguno de estos labs/modelos, puntúa alto (+3 cada uno):
+# son los protagonistas de la actualidad ahora mismo.
+labs:
+  - OpenAI
+  - Anthropic
+  - Claude
+  - Google DeepMind
+  - DeepMind
+  - Gemini
+  - Meta
+  - Llama
+  - xAI
+  - Grok
+  - Alibaba
+  - Qwen
+  - DeepSeek
+  - Mistral
+
+# Temas de fondo que están marcando la conversación de IA (+1 cada uno):
+themes:
+  - modelo
+  - model
+  - agente
+  - agentic
+  - agent
+  - lanzamiento
+  - launch
+  - release
+  - seguridad
+  - security
+  - ciberataque
+  - cyberattack
+  - robot
+  - robótica
+  - robotics
+  - salud
+  - medicina
+  - health
+  - regulación
+  - regulation
+  - precio
+  - pricing
+  - reasoning
+  - razonamiento
+  - benchmark
+  - alignment
+  - safety
+  - open source
+  - open-weight
+  - código abierto
+
+# Patrones de contenido de relleno / listicles genéricos: si el título los
+# contiene, el item se descarta directamente (no se cuenta ni se muestra).
+noise:
+  - "top 10"
+  - "top 5"
+  - "best ai tools"
+  - "mejores herramientas"
+  - "how to use"
+  - "cómo usar"
+  - "5 ways"
+  - "5 formas"
+  - "ways to use"
