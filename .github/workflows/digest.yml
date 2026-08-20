@@ -1,0 +1,41 @@
+name: AI News Digest
+
+# Plantilla lista para usar cuando subas este proyecto a tu propio repo de GitHub.
+# No hace falta ninguna API key: el script solo recolecta y filtra titulares.
+# GitHub Actions te da ~2000 minutos/mes gratis en repos privados (ilimitado en públicos),
+# de sobra para esto (la ejecución tarda segundos).
+
+on:
+  schedule:
+    # 20:00 UTC = 08:00 NZST (hora estándar de Nueva Zelanda, UTC+12).
+    # Cuando entre el horario de verano de NZ (NZDT, UTC+13, normalmente desde
+    # el último domingo de septiembre), ajusta a "0 19 * * *" para mantener las 8 AM locales.
+    - cron: "0 20 * * *"
+  workflow_dispatch: {} # permite lanzarlo manualmente desde la pestaña Actions
+
+jobs:
+  build-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Generar digest
+        run: python3 fetch_digest.py --hours 26
+
+      - name: Subir digest como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ github.run_id }}
+          path: output/*.md
+
+      # Opcional: descomenta y añade tu propio paso de notificación (email, Telegram, etc.)
+      # una vez decidas cómo quieres recibir el digest.
+      # - name: Enviar notificación
+      #   run: echo "Aquí iría el envío del digest"

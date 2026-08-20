@@ -1,0 +1,26 @@
+# Fuentes RSS del digest de noticias de IA
+# Cada fuente es un nodo independiente en el "fan-out": se leen todas en paralelo
+# y luego se combinan (merge) en un único digest.
+#
+# category se usa solo para agrupar el digest final.
+
+feeds:
+  - name: "arXiv cs.AI"
+    url: "https://rss.arxiv.org/rss/cs.AI"
+    category: "Investigación (papers)"
+
+  - name: "OpenAI News"
+    url: "https://openai.com/news/rss.xml"
+    category: "Anuncios de labs"
+
+  - name: "Google DeepMind News"
+    url: "https://deepmind.google/blog/rss.xml"
+    category: "Anuncios de labs"
+
+  - name: "TechCrunch AI"
+    url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+    category: "Prensa / agregadores"
+
+# Nota: Anthropic no publica un feed RSS público en anthropic.com/news
+# (comprobado: anthropic.com/rss.xml devuelve 404). Si en el futuro publican uno,
+# añádelo aquí. Mientras tanto se puede cubrir manualmente o vía web scraping aparte.
