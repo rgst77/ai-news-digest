@@ -37,4 +37,5 @@ jobs:
           curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
             --data-urlencode "text=${TEXT}" \
+            --data-urlencode "parse_mode=Markdown" \
             -o /dev/null -w "Telegram response code: %{http_code}\n"

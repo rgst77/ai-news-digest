@@ -25,12 +25,16 @@ Uso:
 """
 
 import argparse
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import feedparser
 import yaml
+
+LOCAL_TZ = ZoneInfo("Pacific/Auckland")
 
 
 def load_feeds(path: str):
@@ -96,7 +100,6 @@ def fetch_one_feed(feed_cfg, cutoff, timeout=15):
         items = []
         for entry in parsed.entries:
             dt = entry_datetime(entry)
-            # Si no hay fecha, se incluye igualmente (mejor mostrar de más que perder noticias)
             if dt is not None and dt < cutoff:
                 continue
             items.append(
@@ -109,7 +112,7 @@ def fetch_one_feed(feed_cfg, cutoff, timeout=15):
                 }
             )
         return name, items, None
-    except Exception as exc:  # noqa: BLE001 - queremos capturar cualquier fallo de red/parseo
+    except Exception as exc:  # noqa: BLE001
         return name, [], str(exc)
 
 
@@ -126,12 +129,17 @@ def dedupe(items):
     return unique
 
 
+def sanitize_md(text):
+    """Quita caracteres que romperían el parseo de Markdown de Telegram (*, _, `)."""
+    return re.sub(r"[*_`]", "", text or "")
+
+
 def build_digest_markdown(items, run_date, hours):
     by_category = {}
     for item in items:
         by_category.setdefault(item["category"], []).append(item)
 
-    lines = [f"# Digest de noticias de IA — {run_date.isoformat()}", ""]
+    lines = [f"*Digest de noticias de IA — {run_date.isoformat()}*", ""]
     lines.append(f"_Ventana: últimas {hours} horas. Total de items: {len(items)}._")
     lines.append("")
 
@@ -140,10 +148,12 @@ def build_digest_markdown(items, run_date, hours):
         return "\n".join(lines)
 
     for category, cat_items in sorted(by_category.items()):
-        lines.append(f"## {category}")
+        lines.append(f"*{sanitize_md(category)}*")
         lines.append("")
         for item in sorted(cat_items, key=lambda x: x.get("score", 0), reverse=True):
-            lines.append(f"- **{item['title']}** ({item['source']}) — {item['link']}")
+            title = sanitize_md(item["title"])
+            source = sanitize_md(item["source"])
+            lines.append(f"• *{title}* ({source}) — {item['link']}")
         lines.append("")
 
     return "\n".join(lines)
@@ -151,10 +161,10 @@ def build_digest_markdown(items, run_date, hours):
 
 def main():
     parser = argparse.ArgumentParser(description="Fan-out + merge de feeds RSS de IA en un digest diario.")
-    parser.add_argument("--hours", type=int, default=26, help="Ventana de horas hacia atrás a incluir (default: 26)")
+    parser.add_argument("--hours", type=int, default=26)
     parser.add_argument("--feeds", type=str, default=str(Path(__file__).parent / "feeds.yaml"))
     parser.add_argument("--priorities", type=str, default=str(Path(__file__).parent / "priorities.yaml"))
-    parser.add_argument("--max-per-category", type=int, default=5, help="Máximo de items a mostrar por categoría tras filtrar (default: 5)")
+    parser.add_argument("--max-per-category", type=int, default=5)
     parser.add_argument("--out", type=str, default=str(Path(__file__).parent / "output"))
     args = parser.parse_args()
 
@@ -167,12 +177,11 @@ def main():
 
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(hours=args.hours)
+    local_date = now.astimezone(LOCAL_TZ).date()
 
     all_items = []
     errors = []
 
-    # FAN-OUT: cada feed se procesa de forma independiente (secuencial aquí por
-    # simplicidad; con pocos feeds no hace falta paralelizar).
     for feed_cfg in feeds_cfg:
         name, items, error = fetch_one_feed(feed_cfg, cutoff)
         print(f"[{name}] {len(items)} items nuevos" + (f" -- ERROR: {error}" if error else ""))
@@ -180,11 +189,9 @@ def main():
         if error:
             errors.append((name, error))
 
-    # MERGE
     all_items = dedupe(all_items)
     total_before_filter = len(all_items)
 
-    # FILTRO DE RELEVANCIA: descarta ruido evidente y puntúa por relevancia
     scored_items = []
     discarded_noise = 0
     for item in all_items:
@@ -195,7 +202,6 @@ def main():
         item["score"] = score
         scored_items.append(item)
 
-    # Nos quedamos solo con los N mejor puntuados de cada categoría
     by_category = {}
     for item in scored_items:
         by_category.setdefault(item["category"], []).append(item)
@@ -211,11 +217,11 @@ def main():
         f"con el top {args.max_per_category} por categoría"
     )
 
-    digest_md = build_digest_markdown(final_items, now.date(), args.hours)
+    digest_md = build_digest_markdown(final_items, local_date, args.hours)
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / f"digest_{now.date().isoformat()}.md"
+    out_path = out_dir / f"digest_{local_date.isoformat()}.md"
     out_path.write_text(digest_md, encoding="utf-8")
 
     print(f"\nDigest guardado en: {out_path}")
