@@ -1,4 +1,8 @@
-# AI News Digest
+<p align="center">
+  <img src="assets/logo.svg" alt="Agentic AI News" width="480" />
+</p>
+
+# Agentic AI News
 
 Project that generates a daily AI news digest from several RSS feeds
 (fan-out), combined into a single summary (merge).

@@ -1,0 +1,37 @@
+<svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agentic AI News logo">
+  <title>Agentic AI News</title>
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="700" height="180" rx="18" fill="#0a0a0f"/>
+
+  <!-- agent-network mark -->
+  <g stroke="url(#accent)" stroke-width="2" fill="none" opacity="0.9">
+    <line x1="62" y1="66" x2="40" y2="112"/>
+    <line x1="62" y1="66" x2="86" y2="112"/>
+    <line x1="40" y1="112" x2="86" y2="112"/>
+  </g>
+  <circle cx="62" cy="66" r="7" fill="url(#accent)"/>
+  <circle cx="40" cy="112" r="7" fill="url(#accent)"/>
+  <circle cx="86" cy="112" r="7" fill="url(#accent)"/>
+
+  <text xml:space="preserve" x="120" y="100"
+        font-family="Arial Black, Helvetica Neue, sans-serif"
+        font-weight="900"
+        font-size="42">
+    <tspan fill="#f5f5f7">AGENTIC </tspan><tspan fill="url(#accent)">AI</tspan><tspan fill="#f5f5f7"> NEWS</tspan>
+  </text>
+
+  <text x="122" y="132"
+        font-family="Helvetica Neue, Arial, sans-serif"
+        font-weight="700"
+        font-size="13"
+        letter-spacing="3.5"
+        fill="#84848c">
+    DAILY SIGNAL FROM THE AI FRONTIER
+  </text>
+</svg>
