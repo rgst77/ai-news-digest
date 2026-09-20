@@ -9,13 +9,14 @@ Project that generates a daily AI news digest from several RSS feeds
 
 ## Structure
 
+- `assets/logo.svg` — project logo, used in this README.
 - `feeds.yaml` — list of RSS sources to follow (edit it to add/remove sources).
 - `fetch_digest.py` — script that reads all feeds, filters by date, deduplicates and
   saves the digest to `output/digest_YYYY-MM-DD.md`. It doesn't use any paid API: it
   only collects and filters headlines.
 - `priorities.yaml` — relevance filter (labs/themes to prioritize, noise patterns to
   discard) used to keep only the top items per category.
-- `requirements.txt` — dependencies (`feedparser`, `PyYAML`).
+- `requirements.txt` — dependencies (`feedparser`, `PyYAML`, `tzdata`).
 - `.github/workflows/digest.yml` — ready-to-use GitHub Actions workflow (free daily
   cron) that generates the digest and sends it to Telegram.
 
