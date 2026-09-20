@@ -2,25 +2,25 @@
 """
 fetch_digest.py
 
-Proyecto: Digest diario de noticias de IA.
+Project: Daily AI news digest.
 
-Arquitectura (fan-out / merge):
-  1. FAN-OUT: lee varios feeds RSS de forma independiente (cada fuente es un nodo).
-  2. FILTRO: se queda solo con entradas publicadas dentro de la ventana de horas
-     indicada (por defecto 26h, para cubrir huecos entre ejecuciones).
-  3. MERGE: combina todas las entradas en un único digest, agrupado por categoría,
-     y lo guarda como Markdown en output/digest_YYYY-MM-DD.md.
+Architecture (fan-out / merge):
+  1. FAN-OUT: reads several RSS feeds independently (each source is a node).
+  2. FILTER: keeps only entries published within the given hour window
+     (default 26h, to cover gaps between runs).
+  3. MERGE: combines all entries into a single digest, grouped by category,
+     and saves it as Markdown to output/digest_YYYY-MM-DD.md.
 
-No llama a ningún modelo de IA: solo recolecta y filtra. El resumen/síntesis final
-se hace aparte (por ejemplo, pidiéndoselo a Claude), tal y como se planteó el
-proyecto originalmente, para no depender de una API key de pago.
+Does not call any AI model: it only collects and filters. The final
+summary/synthesis is done separately (e.g. by asking Claude), as originally
+planned for the project, to avoid depending on a paid API key.
 
-Además del filtro por fecha, aplica un filtro de RELEVANCIA por palabras clave
-(ver priorities.yaml): descarta ruido evidente (listicles genéricos) y prioriza
-lo que menciona a los labs/temas que dominan la actualidad, quedándose solo con
-los N items mejor puntuados por categoría.
+Besides the date filter, it applies a RELEVANCE filter by keywords
+(see priorities.yaml): discards obvious noise (generic listicles) and
+prioritizes items mentioning the labs/topics dominating the news cycle,
+keeping only the top N items per category.
 
-Uso:
+Usage:
     python3 fetch_digest.py [--hours 26] [--feeds feeds.yaml] [--priorities priorities.yaml] [--max-per-category 5] [--out output]
 """
 
@@ -44,7 +44,7 @@ def load_feeds(path: str):
 
 
 def load_priorities(path: str):
-    """Carga labs/themes/noise desde priorities.yaml. Si no existe, no se filtra nada."""
+    """Loads labs/themes/noise from priorities.yaml. If it doesn't exist, nothing is filtered."""
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
@@ -58,7 +58,7 @@ def load_priorities(path: str):
 
 
 def score_item(item, priorities):
-    """Puntúa un item por relevancia. Devuelve None si hay que descartarlo (ruido)."""
+    """Scores an item by relevance. Returns None if it should be discarded (noise)."""
     title_lower = item["title"].lower()
 
     for pattern in priorities["noise"]:
@@ -76,7 +76,7 @@ def score_item(item, priorities):
 
 
 def entry_datetime(entry):
-    """Devuelve un datetime timezone-aware para una entrada de feedparser, o None."""
+    """Returns a timezone-aware datetime for a feedparser entry, or None."""
     for field in ("published_parsed", "updated_parsed"):
         value = getattr(entry, field, None)
         if value:
@@ -85,8 +85,8 @@ def entry_datetime(entry):
 
 
 def fetch_one_feed(feed_cfg, cutoff, timeout=15):
-    """FAN-OUT: procesa una fuente de forma independiente.
-    Devuelve (nombre_fuente, lista_de_items, error_o_None).
+    """FAN-OUT: processes a source independently.
+    Returns (source_name, list_of_items, error_or_None).
     """
     name = feed_cfg["name"]
     url = feed_cfg["url"]
@@ -95,7 +95,7 @@ def fetch_one_feed(feed_cfg, cutoff, timeout=15):
     try:
         parsed = feedparser.parse(url, request_headers={"User-Agent": "ai-news-digest/1.0"})
         if parsed.bozo and not parsed.entries:
-            return name, [], f"Error al parsear el feed: {parsed.bozo_exception}"
+            return name, [], f"Error parsing feed: {parsed.bozo_exception}"
 
         items = []
         for entry in parsed.entries:
@@ -117,7 +117,7 @@ def fetch_one_feed(feed_cfg, cutoff, timeout=15):
 
 
 def dedupe(items):
-    """Elimina duplicados por título normalizado (varias fuentes pueden citar la misma noticia)."""
+    """Removes duplicates by normalized title (multiple sources may cite the same news item)."""
     seen = set()
     unique = []
     for item in items:
@@ -130,7 +130,7 @@ def dedupe(items):
 
 
 def sanitize_md(text):
-    """Quita caracteres que romperían el parseo de Markdown de Telegram (*, _, `)."""
+    """Strips characters that would break Telegram's Markdown parsing (*, _, `)."""
     return re.sub(r"[*_`]", "", text or "")
 
 
@@ -160,7 +160,7 @@ def build_digest_markdown(items, run_date, hours):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Fan-out + merge de feeds RSS de IA en un digest diario.")
+    parser = argparse.ArgumentParser(description="Fan-out + merge of AI RSS feeds into a daily digest.")
     parser.add_argument("--hours", type=int, default=26)
     parser.add_argument("--feeds", type=str, default=str(Path(__file__).parent / "feeds.yaml"))
     parser.add_argument("--priorities", type=str, default=str(Path(__file__).parent / "priorities.yaml"))
@@ -170,7 +170,7 @@ def main():
 
     feeds_cfg = load_feeds(args.feeds)
     if not feeds_cfg:
-        print("No hay feeds configurados en feeds.yaml", file=sys.stderr)
+        print("No feeds configured in feeds.yaml", file=sys.stderr)
         sys.exit(1)
 
     priorities = load_priorities(args.priorities)
@@ -184,7 +184,7 @@ def main():
 
     for feed_cfg in feeds_cfg:
         name, items, error = fetch_one_feed(feed_cfg, cutoff)
-        print(f"[{name}] {len(items)} items nuevos" + (f" -- ERROR: {error}" if error else ""))
+        print(f"[{name}] {len(items)} new items" + (f" -- ERROR: {error}" if error else ""))
         all_items.extend(items)
         if error:
             errors.append((name, error))
@@ -212,9 +212,9 @@ def main():
         final_items.extend(cat_items[: args.max_per_category])
 
     print(
-        f"\nFiltro de relevancia: {total_before_filter} items -> "
-        f"{discarded_noise} descartados por ruido -> {len(final_items)} tras quedarnos "
-        f"con el top {args.max_per_category} por categoría"
+        f"\nRelevance filter: {total_before_filter} items -> "
+        f"{discarded_noise} discarded as noise -> {len(final_items)} left after keeping "
+        f"the top {args.max_per_category} per category"
     )
 
     digest_md = build_digest_markdown(final_items, local_date, args.hours)
@@ -224,9 +224,9 @@ def main():
     out_path = out_dir / f"digest_{local_date.isoformat()}.md"
     out_path.write_text(digest_md, encoding="utf-8")
 
-    print(f"\nDigest guardado en: {out_path}")
+    print(f"\nDigest saved to: {out_path}")
     if errors:
-        print("\nAvisos:")
+        print("\nWarnings:")
         for name, error in errors:
             print(f"  - {name}: {error}")
 

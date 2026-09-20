@@ -1,10 +1,10 @@
-# Prioridades para filtrar el ruido del digest.
-# Basado en los temas que dominan la conversación de IA en 2026 (labs, agentes,
-# seguridad, economía de la IA, aplicaciones verticales). Edita esta lista cuando
-# cambie el panorama — no hace falta tocar el script.
+# Priorities for filtering out digest noise.
+# Based on the topics dominating AI conversation in 2026 (labs, agents,
+# security, AI economics, vertical applications). Edit this list as the
+# landscape changes — no need to touch the script.
 
-# Si el título menciona alguno de estos labs/modelos, puntúa alto (+3 cada uno):
-# son los protagonistas de la actualidad ahora mismo.
+# If the title mentions any of these labs/models, score it high (+3 each):
+# they're the protagonists of the current news cycle.
 labs:
   - OpenAI
   - Anthropic
@@ -21,7 +21,9 @@ labs:
   - DeepSeek
   - Mistral
 
-# Temas de fondo que están marcando la conversación de IA (+1 cada uno):
+# Background themes shaping AI conversation (+1 each). Kept bilingual on
+# purpose — matches headlines regardless of language, do not translate away
+# the Spanish entries:
 themes:
   - modelo
   - model
@@ -54,8 +56,9 @@ themes:
   - open-weight
   - código abierto
 
-# Patrones de contenido de relleno / listicles genéricos: si el título los
-# contiene, el item se descarta directamente (no se cuenta ni se muestra).
+# Filler content / generic listicle patterns: if the title contains any of
+# these, the item is discarded outright (not counted, not shown). Also kept
+# bilingual on purpose.
 noise:
   - "top 10"
   - "top 5"

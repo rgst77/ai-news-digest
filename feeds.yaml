@@ -1,8 +1,8 @@
-# Fuentes RSS del digest de noticias de IA
-# Cada fuente es un nodo independiente en el "fan-out": se leen todas en paralelo
-# y luego se combinan (merge) en un único digest.
+# RSS sources for the AI news digest
+# Each source is an independent node in the "fan-out": all are read in parallel
+# and then combined (merge) into a single digest.
 #
-# category se usa solo para agrupar el digest final.
+# category is used only to group the final digest.
 
 feeds:
   - name: "arXiv cs.AI"
@@ -21,6 +21,6 @@ feeds:
     url: "https://techcrunch.com/category/artificial-intelligence/feed/"
     category: "Prensa / agregadores"
 
-# Nota: Anthropic no publica un feed RSS público en anthropic.com/news
-# (comprobado: anthropic.com/rss.xml devuelve 404). Si en el futuro publican uno,
-# añádelo aquí. Mientras tanto se puede cubrir manualmente o vía web scraping aparte.
+# Note: Anthropic doesn't publish a public RSS feed at anthropic.com/news
+# (checked: anthropic.com/rss.xml returns 404). If they publish one in the future,
+# add it here. In the meantime it can be covered manually or via separate web scraping.

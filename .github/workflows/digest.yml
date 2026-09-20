@@ -15,19 +15,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Instalar dependencias
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generar digest
+      - name: Generate digest
         run: python3 fetch_digest.py --hours 26
 
-      - name: Subir digest como artefacto
+      - name: Upload digest as artifact
         uses: actions/upload-artifact@v4
         with:
           name: digest-${{ github.run_id }}
           path: output/*.md
 
-      - name: Enviar a Telegram
+      - name: Send to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
