@@ -1,11 +1,12 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="Agentic AI News" width="480" />
+  <img src="assets/logo.svg" alt="AI News Digest" width="480" />
 </p>
 
-# Agentic AI News
+# AI News Digest
 
-Project that generates a daily AI news digest from several RSS feeds
-(fan-out), combined into a single summary (merge).
+Rule-based project (no AI model involved) that generates a daily digest of AI news
+headlines from several RSS feeds (fan-out), combined into a single digest (merge) and
+sent to Telegram.
 
 ## Structure
 

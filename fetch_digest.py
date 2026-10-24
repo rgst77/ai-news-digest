@@ -11,9 +11,8 @@ Architecture (fan-out / merge):
   3. MERGE: combines all entries into a single digest, grouped by category,
      and saves it as Markdown to output/digest_YYYY-MM-DD.md.
 
-Does not call any AI model: it only collects and filters. The final
-summary/synthesis is done separately (e.g. by asking Claude), as originally
-planned for the project, to avoid depending on a paid API key.
+Does not call any AI model: it only collects, filters and ranks headlines
+using plain rules (see priorities.yaml), so it needs no paid API key.
 
 Besides the date filter, it applies a RELEVANCE filter by keywords
 (see priorities.yaml): discards obvious noise (generic listicles) and

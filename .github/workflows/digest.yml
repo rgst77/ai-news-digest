@@ -1,4 +1,4 @@
-name: Agentic AI News
+name: AI News Digest
 
 on:
   schedule:

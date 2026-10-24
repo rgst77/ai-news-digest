@@ -1,6 +1,6 @@
 # RSS sources for the AI news digest
-# Each source is an independent node in the "fan-out": all are read in parallel
-# and then combined (merge) into a single digest.
+# Each source is an independent node in the "fan-out": all are read one after
+# another and then combined (merge) into a single digest.
 #
 # category is used only to group the final digest.
 
